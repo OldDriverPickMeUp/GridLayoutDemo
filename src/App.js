@@ -16,7 +16,7 @@ function getNextId() {
 
 function App() {
   const [gutter, setGutter] = useState(12);
-  const [spanCount, setSpanCount] = useState(24);
+  const [spanCount, setSpanCount] = useState(12);
   const windowSize = useWindowSize();
   const [contentWidth, setContentWidth] = useState(75);
   const [elements, setElements] = useState([]);

@@ -133,7 +133,7 @@ function Toolbar({
           }}
         >
           <div
-            style={{ display: "flex", alignItems: "center", margin: "20px" }}
+            style={{ display: "flex", alignItems: "center", margin: "40px 20px" }}
           >
             <div
               style={{
@@ -155,7 +155,7 @@ function Toolbar({
             </div>
           </div>
           <div
-            style={{ display: "flex", alignItems: "center", margin: "20px" }}
+            style={{ display: "flex", alignItems: "center", margin: "40px 20px" }}
           >
             <div
               style={{
@@ -177,7 +177,7 @@ function Toolbar({
             </div>
           </div>
           <div
-            style={{ display: "flex", alignItems: "center", margin: "20px" }}
+            style={{ display: "flex", alignItems: "center", margin: "40px 20px" }}
           >
             <div
               style={{

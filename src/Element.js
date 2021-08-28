@@ -237,8 +237,10 @@ function DRLayoutElement({
             borderRadius: "4px",
             padding: "4px",
             cursor: "pointer",
+            zIndex: 19,
           }}
           onClick={handleDelete}
+          onTouchEnd={handleDelete}
         >
           <DeleteIcon color="#969696" />
         </div>
