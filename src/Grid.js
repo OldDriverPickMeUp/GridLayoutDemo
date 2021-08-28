@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-function Grid({ gutter, spanCount, windowSize }) {
+function Grid({ gutter, spanCount, windowSize, contentWidth }) {
   return useMemo(() => {
     const toRenderHor = [];
     for (let i = 0; i < spanCount - 1; ++i) {
@@ -8,7 +8,8 @@ function Grid({ gutter, spanCount, windowSize }) {
       toRenderHor.push(2);
     }
     toRenderHor.push(1);
-    const spanHeight = (windowSize.width + gutter) / spanCount - gutter;
+    const spanHeight =
+      ((windowSize.width * contentWidth) / 100 + gutter) / spanCount - gutter;
     const verticalSpanCount = Math.ceil(
       (windowSize.height + gutter) / (spanHeight + gutter)
     );
@@ -78,7 +79,7 @@ function Grid({ gutter, spanCount, windowSize }) {
         </div>
       </div>
     );
-  }, [gutter, spanCount, windowSize]);
+  }, [gutter, spanCount, windowSize, contentWidth]);
 }
 
 export default Grid;
