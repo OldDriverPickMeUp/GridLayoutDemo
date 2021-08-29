@@ -94,6 +94,8 @@ function Toolbar({
   setWidth,
   showGrid,
   setShowGrid,
+  height,
+  setHeight,
   onCreate,
 }) {
   const toggleShowGrid = useCallback(() => {
@@ -133,7 +135,11 @@ function Toolbar({
           }}
         >
           <div
-            style={{ display: "flex", alignItems: "center", margin: "40px 20px" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              margin: "40px 20px",
+            }}
           >
             <div
               style={{
@@ -155,7 +161,37 @@ function Toolbar({
             </div>
           </div>
           <div
-            style={{ display: "flex", alignItems: "center", margin: "40px 20px" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              margin: "40px 20px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "1rem",
+                fontWeight: "600",
+                width: "100px",
+              }}
+            >
+              Height
+            </div>
+            <div style={{ width: "180px" }}>
+              <Slider
+                min={100}
+                max={200}
+                defaultValue={150}
+                value={height}
+                onChange={setHeight}
+              />
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              margin: "40px 20px",
+            }}
           >
             <div
               style={{
@@ -177,7 +213,11 @@ function Toolbar({
             </div>
           </div>
           <div
-            style={{ display: "flex", alignItems: "center", margin: "40px 20px" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              margin: "40px 20px",
+            }}
           >
             <div
               style={{

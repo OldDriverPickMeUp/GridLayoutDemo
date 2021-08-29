@@ -69,6 +69,7 @@ function DRLayoutElement({
   spanCount,
   gutter,
   contentWidth,
+  contentHeight,
   defaultData,
   elementId,
   deleteById,
@@ -169,10 +170,10 @@ function DRLayoutElement({
     if (height < spanHeight) height = spanHeight;
     if (width < spanHeight) width = spanHeight;
     if (
-      height + newTopLeft.y > windowSize.height ||
+      height + newTopLeft.y > (windowSize.height * contentHeight) / 100 ||
       width + newTopLeft.x > (windowSize.width * contentWidth) / 100
     ) {
-      height = windowSize.height - newTopLeft.y;
+      height = (windowSize.height * contentHeight) / 100 - newTopLeft.y;
       width = (windowSize.width * contentWidth) / 100 - newTopLeft.x;
       setSpanCord({
         xSpan: Math.round((width + gutter) / (spanHeight + gutter)),
@@ -181,7 +182,7 @@ function DRLayoutElement({
     }
     rndRef.current.updatePosition(newTopLeft);
     rndRef.current.updateSize({ width, height });
-  }, [spanCount, gutter, windowSize, contentWidth]);
+  }, [spanCount, gutter, windowSize, contentWidth, contentHeight]);
 
   const handleDelete = useCallback(
     () => deleteById(elementId),
