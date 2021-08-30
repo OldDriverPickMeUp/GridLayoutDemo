@@ -97,6 +97,8 @@ function Toolbar({
   height,
   setHeight,
   onCreate,
+  aspectRatio,
+  setAspectRatio,
 }) {
   const toggleShowGrid = useCallback(() => {
     setShowGrid((e) => !e);
@@ -129,7 +131,7 @@ function Toolbar({
           style={{
             color: "#969696",
             padding: "12px",
-            backgroundColor: "rgba(255,255,255,0.6)",
+            backgroundColor: "rgba(255,255,255,0.9)",
             borderRadius: "8px",
             boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
           }}
@@ -235,6 +237,32 @@ function Toolbar({
                 defaultValue={12}
                 value={span}
                 onChange={setSpan}
+              />
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              margin: "40px 20px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "1rem",
+                fontWeight: "600",
+                width: "100px",
+              }}
+            >
+              Aspect Ratio
+            </div>
+            <div style={{ width: "180px" }}>
+              <Slider
+                min={30}
+                max={170}
+                defaultValue={100}
+                value={aspectRatio}
+                onChange={setAspectRatio}
               />
             </div>
           </div>

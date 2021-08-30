@@ -1,5 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import faker from "faker";
 import { Rnd } from "react-rnd";
+import Popup from "reactjs-popup";
+
 function getNodePoints(node) {
   const { x, y, width, height } = node.getBoundingClientRect();
   const p = node.parentNode.getBoundingClientRect();
@@ -16,15 +19,19 @@ function findNearestAnchorForTopLeft(
   spanCount,
   gutter,
   windowSize,
-  contentWidth
+  contentWidth,
+  aspectRatio
 ) {
   const spanWidth =
     ((windowSize.width * contentWidth) / 100 + gutter) / spanCount - gutter;
+  const spanHeight = (spanWidth * aspectRatio) / 100;
+
   const wLoc = Math.round(pt.x / (spanWidth + gutter));
-  const hLoc = Math.round(pt.y / (spanWidth + gutter));
+
+  const hLoc = Math.round(pt.y / (spanHeight + gutter));
   return {
     x: wLoc * (spanWidth + gutter),
-    y: hLoc * (spanWidth + gutter),
+    y: hLoc * (spanHeight + gutter),
   };
 }
 
@@ -33,15 +40,18 @@ function findNearestAnchorForBottomRight(
   spanCount,
   gutter,
   windowSize,
-  contentWidth
+  contentWidth,
+  aspectRatio
 ) {
   const spanWidth =
     ((windowSize.width * contentWidth) / 100 + gutter) / spanCount - gutter;
+  const spanHeight = (spanWidth * aspectRatio) / 100;
+
   const wLoc = Math.round(pt.x / (spanWidth + gutter));
-  const hLoc = Math.round(pt.y / (spanWidth + gutter));
+  const hLoc = Math.round(pt.y / (spanHeight + gutter));
   return {
     x: wLoc * (spanWidth + gutter) - gutter,
-    y: hLoc * (spanWidth + gutter) - gutter,
+    y: hLoc * (spanHeight + gutter) - gutter,
   };
 }
 
@@ -64,6 +74,25 @@ function DeleteIcon({ color }) {
   );
 }
 
+function EditIcon({ color }) {
+  return (
+    <svg
+      t="1630331632367"
+      className="icon"
+      viewBox="0 0 1152 1024"
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      p-id="2885"
+    >
+      <path
+        fill={color || "black"}
+        d="M805.2 166.4l180.4 180.4c7.6 7.6 7.6 20 0 27.6L548.8 811.2l-185.6 20.6c-24.8 2.8-45.8-18.2-43-43l20.6-185.6L777.6 166.4c7.6-7.6 20-7.6 27.6 0z m324-45.8l-97.6-97.6c-30.4-30.4-79.8-30.4-110.4 0l-70.8 70.8c-7.6 7.6-7.6 20 0 27.6l180.4 180.4c7.6 7.6 20 7.6 27.6 0l70.8-70.8c30.4-30.6 30.4-80 0-110.4zM768 692.4V896H128V256h459.6c6.4 0 12.4-2.6 17-7l80-80c15.2-15.2 4.4-41-17-41H96C43 128 0 171 0 224v704c0 53 43 96 96 96h704c53 0 96-43 96-96V612.4c0-21.4-25.8-32-41-17l-80 80c-4.4 4.6-7 10.6-7 17z"
+        p-id="2886"
+      ></path>
+    </svg>
+  );
+}
+
 function DRLayoutElement({
   windowSize,
   spanCount,
@@ -74,6 +103,8 @@ function DRLayoutElement({
   elementId,
   deleteById,
   number,
+  showToolBar,
+  aspectRatio,
 }) {
   const [spanCord, setSpanCord] = useState();
   const spanCordRef = useRef();
@@ -92,56 +123,62 @@ function DRLayoutElement({
           spanCount,
           gutter,
           windowSize,
-          contentWidth
+          contentWidth,
+          aspectRatio
         )
       );
     },
-    [spanCount, gutter, windowSize, contentWidth]
+    [spanCount, gutter, windowSize, contentWidth, aspectRatio]
   );
 
   const handleResizeStop = useCallback(
     (e, dir, refToElement, delta, position) => {
-      const spanHeight =
+      const spanWidth =
         ((windowSize.width * contentWidth) / 100 + gutter) / spanCount - gutter;
+      const spanHeight = (spanWidth * aspectRatio) / 100;
       const { topLeft, bottomRight } = getNodePoints(refToElement);
       const newTopLeft = findNearestAnchorForTopLeft(
         topLeft,
         spanCount,
         gutter,
         windowSize,
-        contentWidth
+        contentWidth,
+        aspectRatio
       );
       const newBottomRight = findNearestAnchorForBottomRight(
         bottomRight,
         spanCount,
         gutter,
         windowSize,
-        contentWidth
+        contentWidth,
+        aspectRatio
       );
       let height = newBottomRight.y - newTopLeft.y;
       let width = newBottomRight.x - newTopLeft.x;
       if (height < spanHeight) height = spanHeight;
-      if (width < spanHeight) width = spanHeight;
+      if (width < spanWidth) width = spanWidth;
       setSpanCord({
-        xSpan: Math.round((width + gutter) / (spanHeight + gutter)),
+        xSpan: Math.round((width + gutter) / (spanWidth + gutter)),
         ySpan: Math.round((height + gutter) / (spanHeight + gutter)),
       });
       rndRef.current.updatePosition(newTopLeft);
       rndRef.current.updateSize({ width, height });
     },
-    [spanCount, gutter, windowSize, contentWidth]
+    [spanCount, gutter, windowSize, contentWidth, aspectRatio]
   );
   useEffect(() => {
     const refToElement = nodeRef.current.parentNode;
-    const spanHeight =
+    const spanWidth =
       ((windowSize.width * contentWidth) / 100 + gutter) / spanCount - gutter;
+    const spanHeight = (spanWidth * aspectRatio) / 100;
     const { topLeft, bottomRight } = getNodePoints(refToElement);
     const newTopLeft = findNearestAnchorForTopLeft(
       topLeft,
       spanCount,
       gutter,
       windowSize,
-      contentWidth
+      contentWidth,
+      aspectRatio,
     );
     if (!spanCordRef.current) {
       const newBottomRight = findNearestAnchorForBottomRight(
@@ -149,14 +186,15 @@ function DRLayoutElement({
         spanCount,
         gutter,
         windowSize,
-        contentWidth
+        contentWidth,
+        aspectRatio
       );
       let height = newBottomRight.y - newTopLeft.y;
       let width = newBottomRight.x - newTopLeft.x;
       if (height < spanHeight) height = spanHeight;
-      if (width < spanHeight) width = spanHeight;
+      if (width < spanWidth) width = spanWidth;
       setSpanCord({
-        xSpan: Math.round((width + gutter) / (spanHeight + gutter)),
+        xSpan: Math.round((width + gutter) / (spanWidth + gutter)),
         ySpan: Math.round((height + gutter) / (spanHeight + gutter)),
       });
       rndRef.current.updatePosition(newTopLeft);
@@ -166,9 +204,9 @@ function DRLayoutElement({
 
     const { xSpan, ySpan } = spanCordRef.current;
     let height = ySpan * (spanHeight + gutter) - gutter;
-    let width = xSpan * (spanHeight + gutter) - gutter;
-    if (height < spanHeight) height = spanHeight;
-    if (width < spanHeight) width = spanHeight;
+    let width = xSpan * (spanWidth + gutter) - gutter;
+    if (height < spanWidth) height = spanHeight;
+    if (width < spanWidth) width = spanWidth;
     if (
       height + newTopLeft.y > (windowSize.height * contentHeight) / 100 ||
       width + newTopLeft.x > (windowSize.width * contentWidth) / 100
@@ -176,18 +214,77 @@ function DRLayoutElement({
       height = (windowSize.height * contentHeight) / 100 - newTopLeft.y;
       width = (windowSize.width * contentWidth) / 100 - newTopLeft.x;
       setSpanCord({
-        xSpan: Math.round((width + gutter) / (spanHeight + gutter)),
+        xSpan: Math.round((width + gutter) / (spanWidth + gutter)),
         ySpan: Math.round((height + gutter) / (spanHeight + gutter)),
       });
     }
     rndRef.current.updatePosition(newTopLeft);
     rndRef.current.updateSize({ width, height });
-  }, [spanCount, gutter, windowSize, contentWidth, contentHeight]);
+  }, [spanCount, gutter, windowSize, contentWidth, contentHeight, aspectRatio]);
 
   const handleDelete = useCallback(
     () => deleteById(elementId),
     [deleteById, elementId]
   );
+  const [contentType, setContent] = useState();
+  const fakeContent = useMemo(() => {
+    if (contentType === "article") {
+      return (
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            overflow: "hidden",
+            lineHeight: "150%",
+            fontSize: "1.5rem",
+            color: "#969696",
+            userSelect: "none",
+          }}
+        >
+          {faker.lorem.paragraph(200)}
+        </div>
+      );
+    }
+    if (contentType === "image") {
+      const { width, height } = nodeRef.current.getBoundingClientRect();
+      return (
+        <div style={{ height: "100%", width: "100%" }}>
+          <img
+            src={faker.image.imageUrl(
+              Math.ceil(width / 100) * 100,
+              Math.ceil(height / 100) * 100,
+              undefined,
+              true
+            )}
+            alt=""
+            height="100%"
+            width="100%"
+          />
+        </div>
+      );
+    }
+    if (contentType === "title") {
+      return (
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            overflow: "hidden",
+            lineHeight: "150%",
+            fontSize: "2.25rem",
+            color: "#969696",
+            display: "flex",
+            alignItems: "center",
+            userSelect: "none",
+          }}
+        >
+          <div>{faker.lorem.sentence()}</div>
+        </div>
+      );
+    }
+    return null;
+  }, [contentType]);
+  const bg = contentType ? "rgba(122,112,200,0.2)" : "rgba(122,112,200,0.3)";
   return (
     <Rnd
       ref={rndRef}
@@ -200,7 +297,7 @@ function DRLayoutElement({
         }
       }
       style={{
-        backgroundColor: "rgba(122,112,200,0.3)",
+        backgroundColor: showToolBar && bg,
         zIndex: elementId,
       }}
       bounds="parent"
@@ -217,34 +314,96 @@ function DRLayoutElement({
           height: "100%",
         }}
       >
-        <div
-          style={{
-            color: "rgba(255,255,255,0.9)",
-            fontSize: "2rem",
-            fontWeight: "600",
-          }}
-        >
-          {number}
-        </div>
-        <div
-          style={{
-            position: "absolute",
-            top: 4,
-            right: 4,
-            width: "1.5rem",
-            height: "1.5rem",
-            backgroundColor: "rgba(255,255,255,0.6)",
-            boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
-            borderRadius: "4px",
-            padding: "4px",
-            cursor: "pointer",
-            zIndex: 19,
-          }}
-          onClick={handleDelete}
-          onTouchEnd={handleDelete}
-        >
-          <DeleteIcon color="#969696" />
-        </div>
+        {fakeContent ? (
+          fakeContent
+        ) : (
+          <div
+            style={{
+              color: "rgba(255,255,255,0.9)",
+              fontSize: "2rem",
+              fontWeight: "600",
+            }}
+          >
+            {number}
+          </div>
+        )}
+
+        {showToolBar && (
+          <div
+            style={{
+              position: "absolute",
+              top: 4,
+              right: 4,
+              width: "1.5rem",
+              height: "1.5rem",
+              backgroundColor: "rgba(255,255,255,0.9)",
+              boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+              borderRadius: "4px",
+              padding: "4px",
+              cursor: "pointer",
+              zIndex: 19,
+            }}
+            onClick={handleDelete}
+            onTouchEnd={handleDelete}
+          >
+            <DeleteIcon color="#969696" />
+          </div>
+        )}
+        {showToolBar && (
+          <Popup
+            trigger={
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(4px + 8px + 4px + 1.5rem)",
+                  right: 4,
+                  width: "1.5rem",
+                  height: "1.5rem",
+                  backgroundColor: "rgba(255,255,255,0.9)",
+                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+                  borderRadius: "4px",
+                  padding: "4px",
+                  cursor: "pointer",
+                  zIndex: 19,
+                }}
+              >
+                <EditIcon color="#969696" />
+              </div>
+            }
+          >
+            <div
+              style={{
+                color: "#969696",
+                padding: "12px",
+                backgroundColor: "rgba(255,255,255,0.9)",
+                borderRadius: "8px",
+                boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+              }}
+            >
+              <div
+                style={{ cursor: "pointer" }}
+                onClick={() => setContent("article")}
+              >
+                article
+              </div>
+              <div
+                style={{ cursor: "pointer" }}
+                onClick={() => setContent("image")}
+              >
+                image
+              </div>
+              <div
+                style={{ cursor: "pointer" }}
+                onClick={() => setContent("title")}
+              >
+                title
+              </div>
+              <div style={{ cursor: "pointer" }} onClick={() => setContent()}>
+                clear
+              </div>
+            </div>
+          </Popup>
+        )}
       </div>
     </Rnd>
   );

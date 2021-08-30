@@ -12,21 +12,28 @@ function getNextId() {
   return ret;
 }
 
-function getDefaultData(windowSize, spanCount, contentWidth, gutter) {
+function getDefaultData(
+  windowSize,
+  spanCount,
+  contentWidth,
+  gutter,
+  aspectRatio
+) {
+  debugger;
   const spanWidth =
     ((windowSize.width * contentWidth) / 100 + gutter) / spanCount - gutter;
-
+  const spanHeight = (spanWidth * aspectRatio) / 100;
   const spanX = Math.ceil(spanCount / 3);
-  const spanY = Math.ceil(windowSize.height / spanWidth / 3);
+  const spanY = Math.ceil(windowSize.height / spanHeight / 3);
   const wLoc = Math.floor((spanCount - spanX) / 2);
   const hLoc = Math.floor(
-    (windowSize.height / spanWidth - spanY) / 2 + window.scrollY / spanWidth
+    (windowSize.height / spanHeight - spanY) / 2 + window.scrollY / spanHeight
   );
   return {
     x: wLoc * (spanWidth + gutter) - gutter,
-    y: hLoc * (spanWidth + gutter) - gutter,
+    y: hLoc * (spanHeight + gutter) - gutter,
     width: spanX * (spanWidth + gutter) - gutter,
-    height: spanY * (spanWidth + gutter) - gutter,
+    height: spanY * (spanHeight + gutter) - gutter,
   };
 }
 
@@ -36,6 +43,7 @@ function App() {
   const windowSize = useWindowSize();
   const [contentWidth, setContentWidth] = useState(75);
   const [contentHeight, setContentHeight] = useState(150);
+  const [aspectRatio, setAspectRatio] = useState(100);
 
   const [elements, setElements] = useState([]);
   const [showGrid, setShowGrid] = useState(true);
@@ -45,11 +53,11 @@ function App() {
       windowSize,
       spanCount,
       contentWidth,
-      gutter
+      gutter,
+      aspectRatio
     );
-    console.log(defaultData);
     setElements((elements) => [...elements, { key: getNextId(), defaultData }]);
-  }, [windowSize, spanCount, contentWidth, gutter]);
+  }, [windowSize, spanCount, contentWidth, gutter, aspectRatio]);
   const handleDeleteById = useCallback((elementId) => {
     setElements((elements) => elements.filter(({ key }) => key !== elementId));
   }, []);
@@ -63,7 +71,7 @@ function App() {
     >
       <div
         style={{
-          width: `${contentWidth}vw`,
+          width: `${contentWidth}%`,
           height: `${contentHeight}vh`,
           position: "relative",
           backgroundColor: "white",
@@ -76,6 +84,7 @@ function App() {
             windowSize={windowSize}
             contentWidth={contentWidth}
             contentHeight={contentHeight}
+            aspectRatio={aspectRatio}
           />
         )}
         <Toolbar
@@ -90,9 +99,12 @@ function App() {
           setShowGrid={setShowGrid}
           height={contentHeight}
           setHeight={setContentHeight}
+          aspectRatio={aspectRatio}
+          setAspectRatio={setAspectRatio}
         />
         {elements.map(({ key, defaultData }, i) => (
           <DRLayoutElement
+            showToolBar={showGrid}
             elementId={key}
             key={key}
             defaultData={defaultData}
@@ -103,6 +115,7 @@ function App() {
             gutter={gutter}
             windowSize={windowSize}
             deleteById={handleDeleteById}
+            aspectRatio={aspectRatio}
           />
         ))}
       </div>
