@@ -228,7 +228,7 @@ function Toolbar({
                 width: "100px",
               }}
             >
-              Span Count
+              Column Count
             </div>
             <div style={{ width: "180px" }}>
               <Slider
