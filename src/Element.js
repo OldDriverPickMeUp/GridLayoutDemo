@@ -341,7 +341,7 @@ function DRLayoutElement({
       onResizeStop={handleResizeStop}
       allowAnyClick={true}
       disableDragging={!showToolBar}
-      enableResizing={!showToolBar}
+      enableResizing={showToolBar}
     >
       <div
         ref={nodeRef}
