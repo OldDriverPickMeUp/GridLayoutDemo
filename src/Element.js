@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import faker from "faker";
 import { Rnd } from "react-rnd";
 import Popup from "reactjs-popup";
@@ -93,6 +99,34 @@ function EditIcon({ color }) {
   );
 }
 
+const EditButton = React.forwardRef((props, ref) => {
+  return (
+    <div
+      ref={ref}
+      {...props}
+      onTouchEndCapture={() => {
+        ref.current && ref.current.click();
+      }}
+      tabIndex="1"
+      style={{
+        position: "absolute",
+        top: "calc(4px + 8px + 4px + 1.5rem)",
+        right: 4,
+        width: "1.5rem",
+        height: "1.5rem",
+        backgroundColor: "rgba(255,255,255,0.9)",
+        boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+        borderRadius: "4px",
+        padding: "4px",
+        cursor: "pointer",
+        zIndex: 19,
+      }}
+    >
+      <EditIcon color="#969696" />
+    </div>
+  );
+});
+
 function DRLayoutElement({
   windowSize,
   spanCount,
@@ -178,7 +212,7 @@ function DRLayoutElement({
       gutter,
       windowSize,
       contentWidth,
-      aspectRatio,
+      aspectRatio
     );
     if (!spanCordRef.current) {
       const newBottomRight = findNearestAnchorForBottomRight(
@@ -259,6 +293,8 @@ function DRLayoutElement({
             alt=""
             height="100%"
             width="100%"
+            style={{ userSelect: "none" }}
+            draggable={false}
           />
         </div>
       );
@@ -303,6 +339,7 @@ function DRLayoutElement({
       bounds="parent"
       onDragStop={handleDragStop}
       onResizeStop={handleResizeStop}
+      allowAnyClick={true}
     >
       <div
         ref={nodeRef}
@@ -350,27 +387,7 @@ function DRLayoutElement({
           </div>
         )}
         {showToolBar && (
-          <Popup
-            trigger={
-              <div
-                style={{
-                  position: "absolute",
-                  top: "calc(4px + 8px + 4px + 1.5rem)",
-                  right: 4,
-                  width: "1.5rem",
-                  height: "1.5rem",
-                  backgroundColor: "rgba(255,255,255,0.9)",
-                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
-                  borderRadius: "4px",
-                  padding: "4px",
-                  cursor: "pointer",
-                  zIndex: 19,
-                }}
-              >
-                <EditIcon color="#969696" />
-              </div>
-            }
-          >
+          <Popup trigger={<EditButton />}>
             <div
               style={{
                 color: "#969696",

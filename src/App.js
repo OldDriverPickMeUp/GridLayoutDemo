@@ -19,7 +19,6 @@ function getDefaultData(
   gutter,
   aspectRatio
 ) {
-  debugger;
   const spanWidth =
     ((windowSize.width * contentWidth) / 100 + gutter) / spanCount - gutter;
   const spanHeight = (spanWidth * aspectRatio) / 100;
